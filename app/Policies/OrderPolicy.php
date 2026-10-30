@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Order;
+use App\Models\User;
+
+class OrderPolicy
+{
+    /**
+     * A user may view an order if they own it, or if they are an admin.
+     */
+    public function view(User $user, Order $order): bool
+    {
+        return $user->isAdmin() || $order->user_id === $user->id;
+    }
+}
