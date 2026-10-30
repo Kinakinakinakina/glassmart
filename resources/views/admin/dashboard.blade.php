@@ -16,8 +16,10 @@
             <div class="card stat"><b>{{ $userCount }}</b>Users</div>
         </div>
 
-        <p class="muted" style="margin-top:18px;">
-            Product &amp; category CRUD and order management arrive in step 6.
-        </p>
+        <div style="margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;">
+            <a class="btn btn-primary" href="{{ route('admin.products.index') }}">Manage products</a>
+            <a class="btn" href="{{ route('admin.categories.index') }}">Manage categories</a>
+            <a class="btn" href="{{ route('admin.orders.index') }}">Manage orders</a>
+        </div>
     </div>
 @endsection

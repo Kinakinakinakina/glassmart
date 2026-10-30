@@ -8,6 +8,9 @@
     <div class="card" style="margin-top:12px;">
         <div class="muted">{{ $product->category->name }}</div>
         <h1 style="margin:6px 0;">{{ $product->name }}</h1>
+        @if ($product->image)
+            <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" style="max-width:320px;width:100%;border-radius:12px;margin:8px 0;">
+        @endif
         <div style="font-size:22px;font-weight:700;color:#0054E3;">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
         <p style="margin-top:12px;">{{ $product->description }}</p>
         <p class="muted">{{ $product->stock > 0 ? $product->stock.' in stock' : 'Out of stock' }}</p>
