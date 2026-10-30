@@ -39,12 +39,15 @@
     <header>
         <a class="brand" href="{{ route('home') }}">GlassMart</a>
         <nav>
+            <a href="{{ route('products.index') }}">Shop</a>
             @auth
-                <span class="muted">Hi, {{ auth()->user()->name }}</span>
+                <a href="{{ route('cart.index') }}">Cart ({{ array_sum(session('cart', [])) }})</a>
+                <a href="{{ route('orders.index') }}">My orders</a>
                 <a href="{{ route('dashboard') }}">Dashboard</a>
                 @if (auth()->user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}">Admin</a>
                 @endif
+                <span class="muted">Hi, {{ auth()->user()->name }}</span>
                 <form class="inline" method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="linklike" type="submit">Logout</button>
