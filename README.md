@@ -1,58 +1,104 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# GlassMart
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A 2010s-nostalgia e-commerce storefront built with **Laravel + MySQL**, styled in the
+**Frutiger Aero** aesthetic (glossy glass panels over grass-and-sky, drifting bubbles,
+wet aqua buttons). Submission for *Web Application Development* — case study
+*Sistem E-Commerce UMKM Lokal*.
 
-## About Laravel
+Full storefront: public catalog, session cart, checkout → orders, hand-written auth with
+roles, and an admin panel (product/category CRUD + order management).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **PHP 8.3+** (with the usual Laravel extensions: `pdo_mysql`, `mbstring`, `openssl`,
+  `fileinfo`, `gd`)
+- **Composer**
+- **MySQL 8.x** (this project was developed with Laragon)
+- **Node.js + npm** (Vite bundles the hand-written CSS/JS)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Local setup
 
 ```bash
-composer require laravel/boost --dev
+# 1. Install PHP dependencies
+composer install
 
-php artisan boost:install
+# 2. Create your environment file and generate the app key
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Configure the database in `.env` (defaults match a stock Laragon install):
 
-## Contributing
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=glassmart
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Create the database, then build the schema and seed the demo data:
 
-## Code of Conduct
+```bash
+# 3. Create the database (adjust client path as needed)
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS glassmart;"
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 4. Run migrations + seeders (2 users, 4 categories, 20 products)
+php artisan migrate:fresh --seed
 
-## Security Vulnerabilities
+# 5. Link the public storage dir (product image uploads; the symlink is gitignored)
+php artisan storage:link
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 6. Build front-end assets (hand-written CSS/JS, bundled by Vite)
+npm install
+npm run build
+```
 
-## License
+Run it:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan serve
+# → http://localhost:8000
+```
+
+> **Importing the SQL dump instead of seeding?** If you prefer to load
+> `database/glassmart.sql`, run `mysql -u root glassmart < database/glassmart.sql`
+> after creating the database (skip step 4). You still need steps 5 and 6.
+
+---
+
+## Demo login credentials
+
+Seeded by `php artisan migrate:fresh --seed`:
+
+| Role     | Email                      | Password   |
+|----------|----------------------------|------------|
+| Admin    | `admin@glassmart.test`     | `password` |
+| Customer | `customer@glassmart.test`  | `password` |
+
+- **Admin** → the `/admin` panel (dashboard, product & category CRUD, order management).
+  The admin account is admin-only and cannot shop.
+- **Customer** → browse, add to cart, checkout, and view order history.
+- Guests can browse the catalog; adding to cart redirects to login.
+
+---
+
+## Tech notes
+
+- **Laravel 13**, PHP 8.3, MySQL, Blade + a little vanilla JS.
+- Hand-written auth (no Breeze/Jetstream) with a `role` middleware guarding `/admin`.
+- The **Frutiger Aero design system is hand-written** (the `.aero-*` glass panels,
+  buttons, layout, product cards, animations and bubbles in `resources/css/app.css` +
+  `resources/js/app.js`). The **Windows 7 window chrome** (title bars, `.window` frames)
+  comes from the third-party **[`7.css`](https://khang-nd.github.io/7.css/)** stylesheet,
+  imported into `app.css` — a pure CSS theme (no JS, no generator; all behaviour and the
+  rest of the styling are hand-written).
+- Session-based cart; checkout converts the cart into an `order` + `order_items` inside
+  a DB transaction (with `lockForUpdate`) and decrements stock atomically.
+- Security: `@csrf` on every form, `{{ }}` output escaping, Eloquent bindings only,
+  server-side validation via Form Requests, custom `403/404/419/429/500/503` error pages.

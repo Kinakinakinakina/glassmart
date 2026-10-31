@@ -26,10 +26,6 @@
                     <a class="muted" href="{{ route('register') }}">Need an account?</a>
                 </div>
             </form>
-
-            <p class="muted" style="margin-top:16px;">
-                Demo: admin@glassmart.test / customer@glassmart.test — password <code>password</code>
-            </p>
         </x-window>
       </div>
     </div>
