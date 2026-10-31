@@ -3,29 +3,37 @@
 @section('title', $activeCategory ? $activeCategory->name.' — GlassMart' : 'Shop — GlassMart')
 
 @section('content')
-    <h1 style="margin-top:0;">{{ $activeCategory?->name ?? 'All products' }}</h1>
+    <div class="aero-cols3">
+        {{-- LEFT: search + category menu --}}
+        <aside class="aero-col-left">
+            @include('partials.catalog-sidebar')
+        </aside>
 
-    <div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;">
-        <a class="btn" href="{{ route('products.index') }}">All</a>
-        @foreach ($categories as $category)
-            <a class="btn" href="{{ route('categories.show', $category) }}">{{ $category->name }}</a>
-        @endforeach
-    </div>
+        {{-- CENTRE: the product grid, inside a window titled by the category --}}
+        <div class="aero-col-main">
+            <x-window :title="$activeCategory?->name ?? 'All products'">
+                <p class="muted" style="margin:0 0 12px;">
+                    {{ $products->total() }} item{{ $products->total() === 1 ? '' : 's' }}
+                    @if ($search) matching “{{ $search }}” @endif
+                </p>
 
-    <form method="GET" action="{{ route('products.index') }}" style="margin-bottom:18px;display:flex;gap:8px;">
-        <input type="text" name="q" value="{{ $search }}" placeholder="Search products..." style="max-width:280px;">
-        <button class="btn" type="submit">Search</button>
-    </form>
+                @if ($products->isEmpty())
+                    <p>No products found. Try another search or category.</p>
+                @else
+                    <div class="product-grid">
+                        @foreach ($products as $product)
+                            @include('partials.product-card', ['product' => $product])
+                        @endforeach
+                    </div>
 
-    @if ($products->isEmpty())
-        <div class="card">No products found.</div>
-    @else
-        <div class="grid">
-            @foreach ($products as $product)
-                @include('partials.product-card', ['product' => $product])
-            @endforeach
+                    <div style="margin-top:18px;">{{ $products->links('partials.pagination') }}</div>
+                @endif
+            </x-window>
         </div>
 
-        <div style="margin-top:18px;">{{ $products->links() }}</div>
-    @endif
+        {{-- RIGHT: the dense "fun" rail (no new-arrivals block on the shop page) --}}
+        <aside class="aero-col-right">
+            @include('partials.sidebar-right')
+        </aside>
+    </div>
 @endsection

@@ -3,15 +3,16 @@
 @section('title', 'New product — Admin')
 
 @section('content')
-    <a class="muted" href="{{ route('admin.products.index') }}">&larr; Back to products</a>
+    <p><a class="muted" href="{{ route('admin.products.index') }}">&larr; Back to products</a></p>
 
-    <div class="card" style="margin-top:12px;max-width:560px;">
-        <h1 style="margin-top:0;">New product</h1>
-        <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
-            @include('admin.products._form')
-            <div style="margin-top:16px;">
-                <button class="btn btn-primary" type="submit">Create product</button>
-            </div>
-        </form>
+    <div style="max-width:560px;">
+        <x-window title="New product">
+            <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
+                @include('admin.products._form')
+                <div style="margin-top:16px;">
+                    <button class="aero-btn aero-btn--primary" type="submit">Create product</button>
+                </div>
+            </form>
+        </x-window>
     </div>
 @endsection

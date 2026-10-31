@@ -23,7 +23,7 @@ class ProductController extends Controller
 
         return view('products.index', [
             'products' => $products,
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::withCount('products')->orderBy('name')->get(),
             'activeCategory' => null,
             'search' => (string) $request->input('q', ''),
         ]);

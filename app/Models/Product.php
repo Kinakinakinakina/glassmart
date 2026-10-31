@@ -38,4 +38,22 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    // Resolve the best available image for this product, in priority order:
+    //   1. an admin-uploaded file (stored under storage/app/public, symlinked
+    //      into public/storage),
+    //   2. a bundled seed photo named after the slug (public/images/products),
+    //   3. a generic glossy placeholder.
+    public function imageUrl(): string
+    {
+        if ($this->image && is_file(public_path('storage/'.$this->image))) {
+            return asset('storage/'.$this->image);
+        }
+
+        if (is_file(public_path('images/products/'.$this->slug.'.jpg'))) {
+            return asset('images/products/'.$this->slug.'.jpg');
+        }
+
+        return asset('images/products/_placeholder.png');
+    }
 }
