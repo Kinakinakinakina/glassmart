@@ -1,10 +1,20 @@
-<div class="card" style="display:flex;flex-direction:column;gap:6px;">
-    @if ($product->image)
-        <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;">
+@php($isNew = $isNew ?? false)
+<div class="product-card">
+    <div class="product-thumb">
+        @if ($isNew)
+            <span class="aero-sticker aero-sticker--new">NEW!</span>
+        @elseif ($product->stock > 0 && $product->stock <= 6)
+            <span class="aero-sticker">ONLY<br>{{ $product->stock }}<br>LEFT</span>
+        @endif
+        <img src="{{ $product->imageUrl() }}" alt="{{ $product->name }}" loading="lazy">
+        <span class="product-tag">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+    </div>
+    <div class="product-name">{{ $product->name }}</div>
+    <div class="product-cat">{{ $product->category->name ?? '' }}</div>
+    @if ($product->stock > 0)
+        <span class="aero-pill aero-pill--instock">{{ $product->stock }} in stock</span>
+    @else
+        <span class="aero-pill aero-pill--out">Out of stock</span>
     @endif
-    <div style="font-weight:600;">{{ $product->name }}</div>
-    <div class="muted">{{ $product->category->name ?? '' }}</div>
-    <div style="font-weight:700;color:#0054E3;">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
-    <div class="muted">{{ $product->stock > 0 ? $product->stock.' in stock' : 'Out of stock' }}</div>
-    <a class="btn" href="{{ route('products.show', $product) }}">View</a>
+    <a class="aero-btn aero-btn--sm" href="{{ route('products.show', $product) }}">View details</a>
 </div>

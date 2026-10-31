@@ -18,7 +18,7 @@ class CategoryController extends Controller
 
         return view('products.index', [
             'products' => $products,
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::withCount('products')->orderBy('name')->get(),
             'activeCategory' => $category,
             'search' => '',
         ]);
