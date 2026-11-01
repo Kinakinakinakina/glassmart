@@ -1,0 +1,21 @@
+# Wasmer package definition for GlassMart (Laravel on Wasmer Edge).
+# Pins the PHP runtime, mounts the project at /app, and serves public/ via
+# PHP's built-in server. See README "Deployment (Wasmer Edge)".
+
+[dependencies]
+# Pin PHP: Wasmer's runtime ships 8.3.x. Do not bump to 8.4 unless a dependency
+# forces it (a newer dep requiring 8.4 is a known cause of broken Wasmer installs).
+"php/php" = "=8.3.4"
+
+[fs]
+# Mount the whole project (built assets + vendor must already exist locally).
+"/app" = "."
+
+[[command]]
+name = "run"
+module = "php/php:php"
+runner = "wasi"
+
+[command.annotations.wasi]
+# Serve the Laravel public/ dir; Wasmer routes the public URL to :8080.
+main-args = ["-t", "/app/public", "-S", "localhost:8080"]

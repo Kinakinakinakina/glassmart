@@ -4,9 +4,16 @@
      stacked layers cross-fade (never hard-cut) through the sidead/ images; see
      startSideAds() in app.js. Tall ads overflow on purpose. --}}
 @php
-    $sideAds = collect(glob(public_path('images/sidead/*.{png,jpg,jpeg,gif,webp}'), GLOB_BRACE) ?: [])
-        ->map(fn ($p) => asset('images/sidead/'.basename($p)))
-        ->values();
+    // Use scandir()+filter, not glob(): glob() returns nothing on Wasmer Edge's
+    // WASIX filesystem, and GLOB_BRACE isn't defined there. scandir() uses plain
+    // readdir and works everywhere.
+    $sideAdDir = public_path('images/sidead');
+    $sideAds = is_dir($sideAdDir)
+        ? collect(scandir($sideAdDir) ?: [])
+            ->filter(fn ($f) => preg_match('/\.(png|jpe?g|gif|webp)$/i', $f))
+            ->map(fn ($f) => asset('images/sidead/'.$f))
+            ->values()
+        : collect();
 @endphp
 @if ($sideAds->isNotEmpty())
     <div class="window aero-window active glass aero-shuffle-win">

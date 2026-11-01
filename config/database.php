@@ -49,7 +49,8 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
+            // Wasmer Edge injects the db name as DB_NAME; locally we use DB_DATABASE.
+            'database' => env('DB_DATABASE', env('DB_NAME', 'laravel')),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -61,7 +62,11 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+                // Wasmer's managed MySQL requires TLS but uses a private CA, so we
+                // encrypt the connection without verifying the certificate chain.
+                // Gated behind DB_SSL_NO_VERIFY so local (Laragon, no TLS) is untouched.
+                Mysql::ATTR_SSL_VERIFY_SERVER_CERT => env('DB_SSL_NO_VERIFY') ? false : null,
+            ], fn ($value) => ! is_null($value)) : [],
         ],
 
         'mariadb' => [

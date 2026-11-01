@@ -15,17 +15,24 @@
          Aero wallpapers, globbed from public/images/bg/. This is the backdrop
          that shows down both sides of the glass shell. --}}
     @php
-        $skyImages = collect(glob(public_path('images/bg/*.{png,jpg,jpeg,gif,webp}'), GLOB_BRACE) ?: [])
-            ->map(fn ($p) => asset('images/bg/'.basename($p)))
-            ->values();
+        // List image files in a public/ subdir and return their asset() URLs.
+        // We use scandir()+filter rather than glob(): glob() returns nothing on
+        // Wasmer Edge's WASIX filesystem (its wildcard matching isn't supported),
+        // and glob()'s GLOB_BRACE flag isn't even defined there. scandir() uses
+        // plain readdir, which works everywhere.
+        $globImages = function (string $dir) {
+            $abs = public_path($dir);
+            return is_dir($abs)
+                ? collect(scandir($abs) ?: [])
+                    ->filter(fn ($f) => preg_match('/\.(png|jpe?g|gif|webp)$/i', $f))
+                    ->map(fn ($f) => asset($dir.'/'.$f))
+                    ->values()
+                : collect();
+        };
+        $skyImages = $globImages('images/bg');
         // Touhou wallpapers — used INSIDE the shell window (see .aero-winbg below).
-        $touhouImages = collect(glob(public_path('images/touhou/*.{png,jpg,jpeg,gif,webp}'), GLOB_BRACE) ?: [])
-            ->map(fn ($p) => asset('images/touhou/'.basename($p)))
-            ->values();
-        $popupAds = collect(glob(public_path('images/popups/*.{png,jpg,jpeg,gif,webp}'), GLOB_BRACE) ?: [])
-            ->merge(glob(public_path('images/ads/*.{png,jpg,jpeg,gif,webp}'), GLOB_BRACE) ?: [])
-            ->map(fn ($p) => asset(str_contains($p, 'popups') ? 'images/popups/'.basename($p) : 'images/ads/'.basename($p)))
-            ->values();
+        $touhouImages = $globImages('images/touhou');
+        $popupAds = $globImages('images/popups')->merge($globImages('images/ads'))->values();
     @endphp
     <div class="aero-sky" aria-hidden="true" data-images='@json($skyImages)'>
         <div class="aero-sky-layer is-active"></div>
