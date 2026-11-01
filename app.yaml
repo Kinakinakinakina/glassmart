@@ -1,0 +1,21 @@
+# Wasmer Edge app deployment config for GlassMart.
+# `wasmer deploy` reads this to create the app and provision the database.
+# NOTE: set `owner` to your Wasmer account/namespace (wasmer deploy can also
+# fill it in interactively on first run). App names are globally unique.
+kind: wasmer.io/App.v0
+name: glassmart
+owner: kinakinakinakina
+package: .
+
+capabilities:
+  # Provisions ONE managed MySQL database on the first deploy and injects
+  # DB_HOST / DB_PORT / DB_NAME / DB_USERNAME / DB_PASSWORD at runtime.
+  database:
+    engine: mysql
+
+locality:
+  # Pick ONE region where managed MySQL is available. NOTE: us-losa1 no longer
+  # supports databases — known working: fr-roub1, ca-beau1.
+  regions:
+    - fr-roub1
+app_id: da_2l9IzteU7G8a

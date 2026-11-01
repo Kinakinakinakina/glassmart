@@ -1,0 +1,25 @@
+# Files excluded from the Wasmer Edge package (syntax like .gitignore).
+
+# public/storage is a local symlink created by `php artisan storage:link`.
+# On Windows it is an ABSOLUTE link, which Wasmer rejects ("must be relative").
+# Edge's filesystem is ephemeral so uploaded images don't persist there anyway,
+# and the seeded catalog serves its images from public/images/ — so we simply
+# don't ship the symlink.
+public/storage
+
+# Never ship the local .env: it carries local values (DB_DATABASE=glassmart,
+# APP_ENV=local, APP_DEBUG=true) that override Wasmer's injected DB_NAME and
+# flip the app into debug mode. On Edge, config comes from Wasmer secrets +
+# the auto-injected DB_* vars instead. (Also keeps APP_KEY out of the upload.)
+.env
+
+# public/hot is written by `npm run dev` (Vite dev server). If it ships, Laravel's
+# @vite serves assets from http://localhost:5173 instead of the built public/build/
+# files — breaking all CSS/JS in production. Always exclude it.
+public/hot
+
+# Not needed at runtime: the PHP app serves the pre-built public/build/ assets;
+# node_modules is only used by the local `npm run build` step.
+node_modules
+
+.git
